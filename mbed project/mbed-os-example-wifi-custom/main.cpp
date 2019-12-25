@@ -113,8 +113,10 @@ int main()
     result = socket.open(wifi);
     // Send a simple http request
     
+/*
     char sbuffer[] = "hello:)";
     nsapi_size_t size = strlen(sbuffer);
+*/
 
     if (result != 0) {
         printf("Error! socket.open() returned: %d\n", result);
@@ -129,8 +131,35 @@ int main()
 
     // Loop until whole request sent
 
-    result = socket.send(sbuffer, size);
+//    result = socket.send(sbuffer, size);
 
+    int result = 1;
+    //0 for no one sitting on the chair
+    while(result)
+    {
+        //result = get_position_result();
+        cin >> result;
+        //1 means the user sits straight
+        if(result == 1)
+        {
+            char sbuffer[] = "Good Posture";
+            nsapi_size_t size = strlen(sbuffer);
+        }
+        //2 means bad posture
+        else if(result == 2)
+        {
+            char sbuffer[] = "BAD Posture";
+            nsapi_size_t size = strlen(sbuffer);
+            result = socket.send(sbuffer, size);
+        }
+        //3 means sitting too long
+        else if(result == 3)
+        {
+            char sbuffer[] = "Sitting TOO long";
+            nsapi_size_t size = strlen(sbuffer);
+            result = socket.send(sbuffer, size);
+        }
+    }
 
     // Receieve an HTTP response and print out the response line
     int remaining = 256;
