@@ -31,7 +31,8 @@ int main(int argc , char *argv[])
 	cout << "PF_INET = "<<PF_INET<<endl;
 
     //localhost test
-    info.sin_addr.s_addr = inet_addr("192.168.43.207");
+    //info.sin_addr.s_addr = inet_addr("192.168.43.207");
+    info.sin_addr.s_addr = inet_addr("192.168.43.8");
     info.sin_port = htons(8700);
 
 
