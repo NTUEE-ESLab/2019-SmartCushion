@@ -1,0 +1,197 @@
+[
+    {
+        "module": "[lib]\\c_w.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 576, 
+            ".data": 20, 
+            ".bss-delta": 0, 
+            ".text": 21927
+        }
+    }, 
+    {
+        "module": "[lib]\\fz_wm.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1312
+        }
+    }, 
+    {
+        "module": "[lib]\\libcpp_w.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 2931, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 66621
+        }
+    }, 
+    {
+        "module": "[lib]\\libcppabi_w.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 2473
+        }
+    }, 
+    {
+        "module": "[lib]\\m_wm.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 794
+        }
+    }, 
+    {
+        "module": "anon$$obj.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 93264, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 64
+        }
+    }, 
+    {
+        "module": "main.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": -28, 
+            ".bss": 5, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1431
+        }
+    }, 
+    {
+        "module": "mbed-os\\components", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 4, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1011
+        }
+    }, 
+    {
+        "module": "mbed-os\\drivers", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 928, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 2387
+        }
+    }, 
+    {
+        "module": "mbed-os\\events", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 3108, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1882
+        }
+    }, 
+    {
+        "module": "mbed-os\\features", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 141, 
+            ".data": 99, 
+            ".bss-delta": 0, 
+            ".text": 13081
+        }
+    }, 
+    {
+        "module": "mbed-os\\hal", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 130, 
+            ".data": 8, 
+            ".bss-delta": 0, 
+            ".text": 2352
+        }
+    }, 
+    {
+        "module": "mbed-os\\platform", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 345, 
+            ".data": 64, 
+            ".bss-delta": 0, 
+            ".text": 8095
+        }
+    }, 
+    {
+        "module": "mbed-os\\rtos", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 7017, 
+            ".data": 168, 
+            ".bss-delta": 0, 
+            ".text": 13929
+        }
+    }, 
+    {
+        "module": "mbed-os\\targets", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 1487, 
+            ".data": 8, 
+            ".bss-delta": 0, 
+            ".text": 17997
+        }
+    }, 
+    {
+        "module": "wifi-ism43362\\ISM43362", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 2, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 8411
+        }
+    }, 
+    {
+        "module": "wifi-ism43362\\ISM43362Interface.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 884, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 4822
+        }
+    }, 
+    {
+        "summary": {
+            "static_ram": 111189, 
+            "total_flash_delta": -28, 
+            "static_ram_delta": 0, 
+            "total_flash": 168956
+        }
+    }
+]
