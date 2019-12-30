@@ -48,8 +48,9 @@ int main(int argc , char *argv[])
         cout<<"loop"<<endl;
         forClientSockfd = accept(socket_fd,(struct sockaddr*) &clientInfo, &addrlen);	//clientInfo is empty, used to store the received info of client
         while(1){
-	        send(forClientSockfd,message,sizeof(message),0);
             recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
+ 
+            send(forClientSockfd,message,sizeof(message),0);
             cout<<"Get: "<<inputBuffer<<endl;
 	    }
     }
