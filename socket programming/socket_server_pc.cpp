@@ -36,6 +36,8 @@ int main(int argc , char *argv[])
     //serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
     serverInfo.sin_port = htons(8700);						//trans local endian to net endian
 
+    while(1)
+    {
     //connect is to get data from other, while bind is to bind own addr on socket (like tell other where we to connect)
     bind(socket_fd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));	
     //we need to continue checking if there are someone to send
@@ -55,6 +57,7 @@ int main(int argc , char *argv[])
             //send(forClientSockfd,message,sizeof(message),0);
             cout<<"Get: "<<inputBuffer<<endl;
 	    }
+    }
     }
     return 0;
 }

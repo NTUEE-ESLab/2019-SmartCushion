@@ -54,6 +54,15 @@ SDL_Surface* gbuttonSurface = NULL;
 //Running image
 SDL_Surface* grunningSurface = NULL;
 
+//sitting long image
+SDL_Surface* gsittingSurface = NULL;
+
+//left image
+SDL_Surface* gleftSurface = NULL;
+
+//right image
+SDL_Surface* grightSurface = NULL;
+
 bool init()
 {
 	//Initialization flag
@@ -103,12 +112,29 @@ bool loadMedia()
 		success = false;
 	}
 	grunningSurface = loadSurface( "pic/running.bmp" );
-	if( gbuttonSurface == NULL )
+	if( grunningSurface == NULL )
 	{
 		printf( "Failed to load running image!\n" );
 		success = false;
 	}
-
+	gsittingSurface = loadSurface( "pic/sitting_long.bmp" );
+	if( gsittingSurface == NULL )
+	{
+		printf( "Failed to load sitting_long image!\n" );
+		success = false;
+	}
+	gleftSurface = loadSurface( "pic/tilt_left.bmp" );
+	if( gleftSurface == NULL )
+	{
+		printf( "Failed to load tilt_left image!\n" );
+		success = false;
+	}
+	grightSurface = loadSurface( "pic/tilt_right.bmp" );
+	if( grightSurface == NULL )
+	{
+		printf( "Failed to load tilt_right image!\n" );
+		success = false;
+	}
 	return success;
 }
 
@@ -189,26 +215,36 @@ void socket_client()
     //state: 0: healthy, 1:too right, 2:too left, 3:sit too long, 4: leave
     while(state[0] != '4')
     {
+		SDL_Rect stretchRect;
+		stretchRect.x = 0;
+		stretchRect.y = 0;
+		stretchRect.w = SCREEN_WIDTH;
+		stretchRect.h = SCREEN_HEIGHT;
         recv(sockfd,state,1,0);
         if(state[0] == '0')
         {
-			cout<<"sit healthy"<<endl;
+			SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &stretchRect );
         }
         else if(state[0] == '1')
         {
 			cout<<"too right"<<endl;
+			SDL_BlitScaled( grightSurface, NULL, gScreenSurface, &stretchRect );
         }
         else if(state[0] == '2')
         {
-			cout<<"too left"<<endl;
+			SDL_BlitScaled( gleftSurface, NULL, gScreenSurface, &stretchRect );
         }
         else if(state[0] == '3') 
 		{
-			cout<<"too long"<<endl;
+			SDL_BlitScaled( gsittingSurface, NULL, gScreenSurface, &stretchRect );
 		}
+		
 		send(sockfd,message,sizeof(message),0);
         //recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
 		cout<<receiveMessage<<endl;
+		
+		//Update the surface
+		SDL_UpdateWindowSurface( gWindow );
     }
 
     //cout<<receiveMessage<<endl;
