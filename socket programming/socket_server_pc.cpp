@@ -32,8 +32,8 @@ int main(int argc , char *argv[])
     //memset(&serverInfo, 0, sizeof(serverInfo));
 
     serverInfo.sin_family = PF_INET;						//sockaddr_in is IPv4
-    //serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
-    serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
+    serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
+    //serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
     serverInfo.sin_port = htons(8700);						//trans local endian to net endian
 
     //connect is to get data from other, while bind is to bind own addr on socket (like tell other where we to connect)
