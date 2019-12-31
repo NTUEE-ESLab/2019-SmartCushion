@@ -63,6 +63,9 @@ void socket_client()
 
         }
         else if(state[0] == '3') 
+        {
+            
+        }
     }
 
     cout<<receiveMessage<<endl;

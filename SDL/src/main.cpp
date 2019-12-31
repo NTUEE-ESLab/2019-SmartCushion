@@ -33,6 +33,9 @@ bool loadMedia();
 //Frees media and shuts down SDL
 void close();
 
+//use for socket
+void socket_client();
+
 //Loads individual image
 SDL_Surface* loadSurface( std::string path );
 
@@ -42,11 +45,14 @@ SDL_Window* gWindow = NULL;
 //The surface contained by the window
 SDL_Surface* gScreenSurface = NULL;
 
-//Current displayed image
-SDL_Surface* gStretchedSurface = NULL;
+//Begin image
+SDL_Surface* gSurface = NULL;
 
-//use for socket
-void socket_client();
+//Start button image
+SDL_Surface* gbuttonSurface = NULL;
+
+//Running image
+SDL_Surface* grunningSurface = NULL;
 
 bool init()
 {
@@ -84,10 +90,22 @@ bool loadMedia()
 	bool success = true;
 
 	//Load stretching surface
-	gStretchedSurface = loadSurface( "pic/smart_cushion.bmp" );
-	if( gStretchedSurface == NULL )
+	gSurface = loadSurface( "pic/smart_cushion.bmp" );
+	if( gSurface == NULL )
 	{
-		printf( "Failed to load stretching image!\n" );
+		printf( "Failed to load smart_cushion image!\n" );
+		success = false;
+	}
+	gbuttonSurface = loadSurface( "pic/start_icon.bmp" );
+	if( gbuttonSurface == NULL )
+	{
+		printf( "Failed to load start_icon image!\n" );
+		success = false;
+	}
+	grunningSurface = loadSurface( "pic/running.bmp" );
+	if( gbuttonSurface == NULL )
+	{
+		printf( "Failed to load running image!\n" );
 		success = false;
 	}
 
@@ -97,8 +115,8 @@ bool loadMedia()
 void close()
 {
 	//Free loaded image
-	SDL_FreeSurface( gStretchedSurface );
-	gStretchedSurface = NULL;
+	SDL_FreeSurface( gSurface );
+	gSurface = NULL;
 
 	//Destroy window
 	SDL_DestroyWindow( gWindow );
@@ -165,36 +183,55 @@ void socket_client()
 
 
     //Send a message to server
-    char message[] = {"Hi there"};
+    char message[] = {"Hi, I've heard you!"};
     char receiveMessage[100] = {};
     char state[1] = {};
     //state: 0: healthy, 1:too right, 2:too left, 3:sit too long, 4: leave
     while(state[0] != '4')
     {
-        send(sockfd,message,sizeof(message),0);
         recv(sockfd,state,1,0);
-        recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
         if(state[0] == '0')
         {
-
+			cout<<"sit healthy"<<endl;
         }
         else if(state[0] == '1')
         {
-
+			cout<<"too right"<<endl;
         }
         else if(state[0] == '2')
         {
-
+			cout<<"too left"<<endl;
         }
         else if(state[0] == '3') 
+		{
+			cout<<"too long"<<endl;
+		}
+		send(sockfd,message,sizeof(message),0);
+        //recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
+		cout<<receiveMessage<<endl;
     }
 
-    cout<<receiveMessage<<endl;
+    //cout<<receiveMessage<<endl;
     cout<<"close Socket"<<endl;
     close(sockfd);
     return ;
 }
 
+void reset_screen(SDL_Rect &buttonRect)
+{
+	//Apply the image stretched
+	SDL_Rect stretchRect;
+	stretchRect.x = 0;
+	stretchRect.y = 0;
+	stretchRect.w = SCREEN_WIDTH;
+	stretchRect.h = SCREEN_HEIGHT;
+	SDL_BlitScaled( gSurface, NULL, gScreenSurface, &stretchRect );
+
+	SDL_BlitScaled( gbuttonSurface, NULL, gScreenSurface, &buttonRect );
+
+	//Update the surface
+	SDL_UpdateWindowSurface( gWindow );
+}
 
 int main( int argc, char* args[] )
 {
@@ -219,6 +256,15 @@ int main( int argc, char* args[] )
 			//Event handler
 			SDL_Event e;
 
+			//Start button view point
+			SDL_Rect buttonRect;
+			buttonRect.x = SCREEN_WIDTH*2/5;
+			buttonRect.y = SCREEN_HEIGHT*2/3;
+			buttonRect.w = SCREEN_WIDTH/5;
+			buttonRect.h = SCREEN_HEIGHT/6;
+
+			reset_screen(buttonRect);
+
 			//While application is running
 			while( !quit )
 			{
@@ -236,20 +282,25 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_MOUSEBUTTONUP && mouse )
 					{
-						socket_client();
+						int x,y;
+						SDL_GetMouseState( &x, &y );
+						if( x>buttonRect.x && x<buttonRect.x+buttonRect.w && y>buttonRect.y && y<buttonRect.y+buttonRect.h )
+						{
+							//Apply the image stretched
+							SDL_Rect runningRect;
+							runningRect.x = 0;
+							runningRect.y = 0;
+							runningRect.w = SCREEN_WIDTH;
+							runningRect.h = SCREEN_HEIGHT;
+							SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &runningRect );
+							//Update the surface
+							SDL_UpdateWindowSurface( gWindow );
+							socket_client();
+							reset_screen(buttonRect);
+						}
+						mouse = false;
 					}
 				}
-
-				//Apply the image stretched
-				SDL_Rect stretchRect;
-				stretchRect.x = 0;
-				stretchRect.y = 0;
-				stretchRect.w = SCREEN_WIDTH;
-				stretchRect.h = SCREEN_HEIGHT;
-				SDL_BlitScaled( gStretchedSurface, NULL, gScreenSurface, &stretchRect );
-			
-				//Update the surface
-				SDL_UpdateWindowSurface( gWindow );
 			}
 		}
 	}
