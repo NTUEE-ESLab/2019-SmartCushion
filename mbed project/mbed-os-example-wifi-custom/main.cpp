@@ -133,32 +133,40 @@ int main()
 
 //    result = socket.send(sbuffer, size);
 
-    int result = 1;
+    int pos;
+    int posarray[10]={1,1,1,1,2,2,2,3,0};
+    int count=0;
     //0 for no one sitting on the chair
-    while(result)
+    while(pos)
     {
-        //result = get_position_result();
-        cin >> result;
+        //pos = get_position_result();
+        pos = posarray[count];
         //1 means the user sits straight
-        if(result == 1)
+        if(pos == 1)
         {
             char sbuffer[] = "Good Posture";
             nsapi_size_t size = strlen(sbuffer);
         }
         //2 means bad posture
-        else if(result == 2)
+        else if(pos == 2)
         {
             char sbuffer[] = "BAD Posture";
             nsapi_size_t size = strlen(sbuffer);
-            result = socket.send(sbuffer, size);
+            pos = socket.send(sbuffer, size);
         }
         //3 means sitting too long
-        else if(result == 3)
+        else if(pos == 3)
         {
             char sbuffer[] = "Sitting TOO long";
             nsapi_size_t size = strlen(sbuffer);
-            result = socket.send(sbuffer, size);
+            pos = socket.send(sbuffer, size);
         }
+        else{
+            char sbuffer[] = "leave";
+            nsapi_size_t size = strlen(sbuffer);
+            pos = socket.send(sbuffer, size);   
+        }
+        count++;
     }
 
     // Receieve an HTTP response and print out the response line
