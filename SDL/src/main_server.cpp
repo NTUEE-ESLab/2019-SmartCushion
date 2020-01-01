@@ -210,6 +210,8 @@ bool checkmousepos(SDL_Rect &Rect)
 	int x,y;
 	SDL_GetMouseState( &x, &y );
 	cout<<"x = "<<x<<",y ="<<y<<endl;
+	cout<<"rec.x_1 = "<<Rect.x<<",rec.y_1 ="<<Rect.y<<endl;
+	cout<<"rec.x_2 = "<<Rect.x+Rect.w<<",rec.y_2 ="<<Rect.y+Rect.h<<endl;
 	if( x>Rect.x && x<Rect.x+Rect.w && y>Rect.y && y<Rect.y+Rect.h )
 		return false;
 	else return true;
@@ -221,22 +223,22 @@ void update(char *recMessage)
 	//set screen
 	if(recMessage[0] == 'c')
 	{
-		cout<<"in update function, state is "<<recMessage[0];
+		cout<<"in update function, state is "<<recMessage[0]<<endl;
 		set_state(grunningSurface);
 	}
 	else if(recMessage[0] == 'd')
 	{
-		cout<<"in update function, state is "<<recMessage[0];
+		cout<<"in update function, state is "<<recMessage[0]<<endl;
 		set_state(grightSurface);
 	}
 	else if(recMessage[0] == 'e')
 	{
-		cout<<"in update function, state is "<<recMessage[0];
+		cout<<"in update function, state is "<<recMessage[0]<<endl;
 		set_state(gleftSurface);
 	}
 	else if(recMessage[0] == 'f') 
 	{
-		cout<<"in update function, state is "<<recMessage[0];
+		cout<<"in update function, state is "<<recMessage[0]<<endl;
 		set_state(gsittingSurface);
 	}
 	return;
@@ -264,95 +266,8 @@ void set_state(SDL_Surface *surface)
 	return;
 }
 
-void socket_server()
-{	
-	//create a socket
-	char recMessage[256] = {};
-	recMessage[0] = 'c';
-    char message[] = {'9'};
-    int socket_fd = 0, forClientSockfd;
-    socket_fd = socket(AF_INET , SOCK_STREAM , 0);		//AF_INET(IPv6) means two computer communicate with the net. 0 is the defalut value
-    												//socket name includes IP, port, protocal
-    cout << "socket_fd = "<<socket_fd<<endl;
-    
-    if (socket_fd == -1){
-        cout<<"Fail to create a socket."<<endl;
-    }
-
-    //connection of socket
-    struct sockaddr_in serverInfo, clientInfo;
-    socklen_t addrlen = sizeof(clientInfo);
-    bzero(&serverInfo,sizeof(serverInfo));						//initialize, set bits to 0
-    //memset(&serverInfo, 0, sizeof(serverInfo));
-
-    serverInfo.sin_family = PF_INET;						//sockaddr_in is IPv4
-    //serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
-    serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");
-    serverInfo.sin_port = htons(8700);						//trans local endian to net endian
-
-/*
-    //connect is to get data from other, while bind is to bind own addr on socket (like tell other where we to connect)
-    bind(socket_fd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));	
-    //we need to continue checking if there are someone to send
-    listen(socket_fd,5);	//it allows 5 people in the waiting array
-*/   
-    cout<<"start loop"<<endl;
-    bool quit = false;
-
-	//connect is to get data from other, while bind is to bind own ad
-	bind(socket_fd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));
-
-    while(!quit){
-        
-        //we need to continue checking if there are someone to send
-        listen(socket_fd,5);	//it allows 5 people in the waiting array
-    
-    	//use accept to see the clinet. it will generate a new socket for it and remove the request from waiting array
-        cout<<"loop"<<endl;
-        forClientSockfd = accept(socket_fd,(struct sockaddr*) &clientInfo, &addrlen);	//clientInfo is empty, used to store the received info of client
-        int recv_status;
-		recMessage[0] = 'c';
-        
-
-		//state: left->right abcde
-		while(!quit)
-		{
-			int sendbit = send(forClientSockfd,message,sizeof(message),0);
-            if (sendbit != 0)
-            {
-                recv_status = recv(forClientSockfd,recMessage,sizeof(recMessage),0);
-            
-                if(recv_status == 0 || recv_status == -1)
-                {
-                    //create a pic of failed connect and restart
-                    recMessage[0] == 'x';
-                    quit = true;
-                    close(forClientSockfd);
-                    break;
-                }
-                else if(recMessage[0] == 'x') 
-                {
-                    quit = true;
-                    close(forClientSockfd);
-                }
-                cout<<"The message is : "<<recMessage<<endl;
-				update(recMessage);
-                sleep(1);
-                sendbit = 0;
-            }
-		}
-    }
-
-    //cout<<receiveMessage<<endl;
-    cout<<"close Socket"<<endl;
-	
-    close(socket_fd);
-    return ;
-}
-
 int main( int argc, char* args[] )
 {
-	//set();
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -366,10 +281,39 @@ int main( int argc, char* args[] )
 			printf( "Failed to load media!\n" );
 		}
 		else
-		{	
+		{
+			//create a socket
+			char recMessage[256] = {};
+			recMessage[0] = 'c';
+			char message[] = {'9'};
+			int socket_fd = 0, forClientSockfd;
+			socket_fd = socket(AF_INET , SOCK_STREAM , 0);		//AF_INET(IPv6) means two computer communicate with the net. 0 is the defalut value
+															//socket name includes IP, port, protocal
+			cout << "socket_fd = "<<socket_fd<<endl;
+			
+			if (socket_fd == -1){
+				cout<<"Fail to create a socket."<<endl;
+			}
+
+			//connection of socket
+			struct sockaddr_in serverInfo, clientInfo;
+			socklen_t addrlen = sizeof(clientInfo);
+			bzero(&serverInfo,sizeof(serverInfo));						//initialize, set bits to 0
+			//memset(&serverInfo, 0, sizeof(serverInfo));
+
+			serverInfo.sin_family = PF_INET;						//sockaddr_in is IPv4
+			//serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
+			serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");
+			serverInfo.sin_port = htons(8700);						//trans local endian to net endian
+
+			//connect is to get data from other, while bind is to bind own ad
+			bind(socket_fd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));
+			
 			//Main loop flag
 			bool quit = false;
 			bool mouse = false;
+			//state, false for start, true for running
+			bool state = false;
 
 			//Event handler
 			SDL_Event e;
@@ -380,6 +324,12 @@ int main( int argc, char* args[] )
 			buttonRect.y = SCREEN_HEIGHT*2/3;
 			buttonRect.w = SCREEN_WIDTH/5;
 			buttonRect.h = SCREEN_HEIGHT/6;
+			//exit button
+			SDL_Rect exitRect;
+			exitRect.x = SCREEN_WIDTH*5/6;
+			exitRect.y = SCREEN_HEIGHT*3/4;
+			exitRect.w = SCREEN_WIDTH/6;
+			exitRect.h = SCREEN_HEIGHT/4;
 
 			reset_screen(buttonRect);
 
@@ -389,6 +339,7 @@ int main( int argc, char* args[] )
 				//Handle events on queue
 				while( SDL_PollEvent( &e ) != 0 )
 				{
+					cout<<e.type<<endl;
 					//User requests quit
 					if( e.type == SDL_QUIT )
 					{
@@ -400,19 +351,63 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_MOUSEBUTTONUP && mouse )
 					{
-						if( !checkmousepos(buttonRect))
+						cout<<"mouse up"<<endl;
+						if( !checkmousepos(buttonRect) && !state)
 						{
+							cout<<"starting state"<<endl;
 							set_state(grunningSurface);
-							socket_server();
-							quit = true;
+							state = true;
+							//we need to continue checking if there are someone to send
+        					listen(socket_fd,5);	//it allows 5 people in the waiting array
+							forClientSockfd = accept(socket_fd,(struct sockaddr*) &clientInfo, &addrlen);	//clientInfo is empty, used to store the received info of client
+						}
+						else if(state)
+						{
+							cout<<"running socket"<<endl;
+							cout<<checkmousepos(exitRect);
+							if(!checkmousepos(exitRect))
+							{
+								cout<<"close client"<<endl;
+								close(forClientSockfd);
+								state = false;
+								reset_screen(buttonRect);
+							}
 						}
 						mouse = false;
 					}
 				}
+				if(state)
+				{
+					int sendbit = send(forClientSockfd,message,sizeof(message),0);
+					int recv_status;
+					if (sendbit != 0)
+					{
+						recv_status = recv(forClientSockfd,recMessage,sizeof(recMessage),0);
+					
+						if(recv_status == 0 || recv_status == -1)
+						{
+							//create a pic of failed connect and restart
+							recMessage[0] == 'x';
+							quit = true;
+							close(forClientSockfd);
+							break;
+						}
+						else if(recMessage[0] == 'x') 
+						{
+							quit = true;
+							close(forClientSockfd);
+						}
+						cout<<"The message is : "<<recMessage<<endl;
+						update(recMessage);
+						sleep(1);
+						sendbit = 0;
+					}
+				}
 			}
+			cout<<"close server"<<endl;
+			close(socket_fd);
 		}
 	}
-
 	//Free resources and close SDL
 	close();
 

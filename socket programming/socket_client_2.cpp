@@ -55,7 +55,8 @@ int main(int argc , char *argv[])
         
         receive_status = recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
         cout << "receive : \"" << receiveMessage << "\", status: "<< receive_status<< endl;
-        cin>> message;
+        //cin>> message;
+        message[0] = 'd';
         send_status = send(sockfd,message,sizeof(message),0);
         
         
