@@ -45,36 +45,20 @@ int main(int argc , char *argv[])
 
 
     //Send a message to server
-    char message[] = {"Hi! "};
+    char message[100] = {};
     char receiveMessage[100] = {};
     int send_status, receive_status;
-    for(int i=0;i<10;++i){
-        char num_count[5];
-        sprintf(num_count,"%d",i);
-        char * newArray = new char[std::strlen(message)+std::strlen(num_count)+1];
-        std::strcpy(newArray,message);
-        std::strcat(newArray,num_count);
-        send_status = send(sockfd,newArray,sizeof(newArray),0);
-        cout << "send : \"" << newArray << "\", status: "<< send_status<< endl;
-        delete [] newArray;
+    
+
+
+    while(1){
+        
         receive_status = recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
         cout << "receive : \"" << receiveMessage << "\", status: "<< receive_status<< endl;
-
-    }
-
-    cin>> send_status;
-
-    for(int i=send_status;i<20;++i){
-        char num_count[5];
-        sprintf(num_count,"%d",i);
-        char * newArray = new char[std::strlen(message)+std::strlen(num_count)+1];
-        std::strcpy(newArray,message);
-        std::strcat(newArray,num_count);
-        send_status = send(sockfd,newArray,sizeof(newArray),0);
-        cout << "send : \"" << newArray << "\", status: "<< send_status<< endl;
-        delete [] newArray;
-        receive_status = recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
-        cout << "receive : \"" << receiveMessage << "\", status: "<< receive_status<< endl;
+        cin>> message;
+        send_status = send(sockfd,message,sizeof(message),0);
+        
+        
 
     }
     cout<<"close Socket"<<endl;

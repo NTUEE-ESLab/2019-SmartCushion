@@ -32,8 +32,8 @@ int main(int argc , char *argv[])
     //memset(&serverInfo, 0, sizeof(serverInfo));
 
     serverInfo.sin_family = PF_INET;						//sockaddr_in is IPv4
-    serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
-    //serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
+    //serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
+    serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
     serverInfo.sin_port = htons(8700);						//trans local endian to net endian
 
     while(1)
@@ -50,15 +50,15 @@ int main(int argc , char *argv[])
         cout<<"loop"<<endl;
         forClientSockfd = accept(socket_fd,(struct sockaddr*) &clientInfo, &addrlen);	//clientInfo is empty, used to store the received info of client
         while(1){
-            char state[1] = {};
+            char state[] = {"I am server"};
 
             //int checkRec = recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
 
-            cin>>state;
+            //cin>>state;
             int checkRec = recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
 
-            send(forClientSockfd,state,1,0);
-            
+            send(forClientSockfd,state,sizeof(state),0);
+
             //send(forClientSockfd,message,sizeof(message),0);
             cout<<"Get: "<<inputBuffer<<endl;
 	    }

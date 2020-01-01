@@ -1,13 +1,8 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2019)
-and may not be redistributed without written permission.*/
-
 //Using SDL and standard IO
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <string>
-#include "socket_client.h"
 
-///////use for socket
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -16,6 +11,8 @@ and may not be redistributed without written permission.*/
 #include <arpa/inet.h>
 #include <iostream>
 #include <sys/time.h>
+#include <cstring>
+//#include "socket_server.h"
 
 using namespace std;
 
@@ -32,15 +29,14 @@ bool loadMedia();
 //Frees media and shuts down SDL
 void close();
 
-//use for socket
-void socket_client();
-int recvtimeout(int s, char *buf, int len, int timeout);
-
 //check if mouse in rectangle
 bool checkmousepos(SDL_Rect &Rect);
 
+//refresh the screen with current state
+void set_state(SDL_Surface *surface);
+
 //Loads individual image
-SDL_Surface* loadSurface( std::string path );
+SDL_Surface* loadSurface( string path );
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -191,151 +187,6 @@ SDL_Surface* loadSurface( string path )
 	return optimizedSurface;
 }
 
-int recvtimeout(int sockfd, char *buf, int len, int timeout)
-{
-	fd_set fds;	
-	int n;
-	struct timeval tv;
-
-	// file descriptor set
-	FD_ZERO(&fds);
-	FD_SET(sockfd, &fds);
-
-	// set timeout struct timeval
-	tv.tv_sec = timeout;
-	tv.tv_usec = 0;
-
-	// wait until timeout or recieve data
-	n = select(sockfd+1, &fds, NULL, NULL, &tv);
-	// time out
-	if (n == 0) 
-	{
-		cout<<"time out"<<endl;
-		return -2; 
-	}
-	// error
-	if (n == -1) return -1;
-
-	return recv(sockfd, buf, len, 0);
-}
-
-void socket_client()
-{	
-	//
-	SDL_Rect stretchRect;
-	stretchRect.x = 0;
-	stretchRect.y = 0;
-	stretchRect.w = SCREEN_WIDTH;
-	stretchRect.h = SCREEN_HEIGHT;
-
-	SDL_Rect exitRect;
-	exitRect.x = SCREEN_WIDTH*5/6;
-	exitRect.y = SCREEN_HEIGHT*3/4;
-	exitRect.w = SCREEN_WIDTH/6;
-	exitRect.h = SCREEN_HEIGHT/4;
-	SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &stretchRect );
-							
-
-	SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
-	//Update the surface
-	SDL_UpdateWindowSurface( gWindow );
-
-	//socket的建立
-    int sockfd = 0;
-    sockfd = socket(AF_INET , SOCK_STREAM , 0);
-
-    if (sockfd == -1){
-		cout<<"Fail to create a socket.";
-    }
-
-    //socket的連線
-
-    struct sockaddr_in info;
-    bzero(&info,sizeof(info));
-    info.sin_family = PF_INET;
-
-    //localhost test
-    //info.sin_addr.s_addr = inet_addr("192.168.43.207");
-    //info.sin_addr.s_addr = inet_addr("192.168.43.8");
-    info.sin_addr.s_addr = inet_addr("127.0.0.1");
-	info.sin_port = htons(8700);
-
-
-    int err = connect(sockfd,(struct sockaddr *)&info,sizeof(info));
-	if(err==-1){
-        cout<<"Connection error"<<endl;
-    }
-
-    //Send a message to server
-    char message[] = {"Hi, I've heard you!"};
-    char receiveMessage[100] = {};
-    //char state[1] = {'0'};
-	receiveMessage[0] = '0';
-
-	bool exit = false;
-    //state: 0: healthy, 1:too right, 2:too left, 3:sit too long, 4: leave
-    while(!exit)
-    {
-		SDL_Event e_2;
-		bool mouse = false;
-		int sendState = send(sockfd,message,sizeof(message),MSG_DONTWAIT);
-		cout << "sendState = " <<receiveMessage[0] <<endl;
-        //int recvState = recv(sockfd,state,1,0);
-		int recvState = recvtimeout(sockfd, receiveMessage, sizeof(receiveMessage), 10);
-		//socket server is closed
-		if(recvState == 0)
-		{
-			cout<<"close Socket"<<endl;
-    		close(sockfd);
-			return;
-		}
-		//error
-		else if(recvState == -1)
-		{
-			cout<<"error";
-		}
-		else if(receiveMessage[0] == '0')
-		{
-			SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &stretchRect );
-		}
-		else if(receiveMessage[0] == '1')
-		{
-			SDL_BlitScaled( grightSurface, NULL, gScreenSurface, &stretchRect );
-		}
-		else if(receiveMessage[0] == '2')
-		{
-			SDL_BlitScaled( gleftSurface, NULL, gScreenSurface, &stretchRect );
-		}
-		else if(receiveMessage[0] == '3') 
-		{
-			SDL_BlitScaled( gsittingSurface, NULL, gScreenSurface, &stretchRect );
-		}
-
-		SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
-        //recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
-		cout<<"The message is : "<<receiveMessage<<endl;
-		
-		//Update the surface
-		SDL_UpdateWindowSurface( gWindow );
-		while(SDL_PollEvent( &e_2 ) != 0)
-		{	
-			if( e_2.type == SDL_MOUSEBUTTONDOWN )
-			{
-				mouse = true;
-			}
-			else if( e_2.type == SDL_MOUSEBUTTONUP && mouse )
-			{
-				exit = checkmousepos(exitRect);
-			}
-		}
-    }
-
-    //cout<<receiveMessage<<endl;
-    cout<<"close Socket"<<endl;
-    close(sockfd);
-    return ;
-}
-
 //set the start view
 void reset_screen(SDL_Rect &buttonRect)
 {
@@ -364,8 +215,144 @@ bool checkmousepos(SDL_Rect &Rect)
 	else return true;
 }
 
+void update(char *recMessage)
+{
+	
+	//set screen
+	if(recMessage[0] == 'c')
+	{
+		cout<<"in update function, state is "<<recMessage[0];
+		set_state(grunningSurface);
+	}
+	else if(recMessage[0] == 'd')
+	{
+		cout<<"in update function, state is "<<recMessage[0];
+		set_state(grightSurface);
+	}
+	else if(recMessage[0] == 'e')
+	{
+		cout<<"in update function, state is "<<recMessage[0];
+		set_state(gleftSurface);
+	}
+	else if(recMessage[0] == 'f') 
+	{
+		cout<<"in update function, state is "<<recMessage[0];
+		set_state(gsittingSurface);
+	}
+	return;
+}
+
+void set_state(SDL_Surface *surface)
+{
+	//set screen
+	SDL_Rect stretchRect;
+	stretchRect.x = 0;
+	stretchRect.y = 0;
+	stretchRect.w = SCREEN_WIDTH;
+	stretchRect.h = SCREEN_HEIGHT;
+
+	SDL_Rect exitRect;
+	exitRect.x = SCREEN_WIDTH*5/6;
+	exitRect.y = SCREEN_HEIGHT*3/4;
+	exitRect.w = SCREEN_WIDTH/6;
+	exitRect.h = SCREEN_HEIGHT/4;
+
+	SDL_BlitScaled( surface, NULL, gScreenSurface, &stretchRect );
+	SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
+	//Update the surface
+	SDL_UpdateWindowSurface( gWindow );
+	return;
+}
+
+void socket_server()
+{	
+	//create a socket
+	char recMessage[256] = {};
+	recMessage[0] = 'c';
+    char message[] = {'9'};
+    int socket_fd = 0, forClientSockfd;
+    socket_fd = socket(AF_INET , SOCK_STREAM , 0);		//AF_INET(IPv6) means two computer communicate with the net. 0 is the defalut value
+    												//socket name includes IP, port, protocal
+    cout << "socket_fd = "<<socket_fd<<endl;
+    
+    if (socket_fd == -1){
+        cout<<"Fail to create a socket."<<endl;
+    }
+
+    //connection of socket
+    struct sockaddr_in serverInfo, clientInfo;
+    socklen_t addrlen = sizeof(clientInfo);
+    bzero(&serverInfo,sizeof(serverInfo));						//initialize, set bits to 0
+    //memset(&serverInfo, 0, sizeof(serverInfo));
+
+    serverInfo.sin_family = PF_INET;						//sockaddr_in is IPv4
+    //serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
+    serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverInfo.sin_port = htons(8700);						//trans local endian to net endian
+
+/*
+    //connect is to get data from other, while bind is to bind own addr on socket (like tell other where we to connect)
+    bind(socket_fd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));	
+    //we need to continue checking if there are someone to send
+    listen(socket_fd,5);	//it allows 5 people in the waiting array
+*/   
+    cout<<"start loop"<<endl;
+    bool quit = false;
+
+	//connect is to get data from other, while bind is to bind own ad
+	bind(socket_fd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));
+
+    while(!quit){
+        
+        //we need to continue checking if there are someone to send
+        listen(socket_fd,5);	//it allows 5 people in the waiting array
+    
+    	//use accept to see the clinet. it will generate a new socket for it and remove the request from waiting array
+        cout<<"loop"<<endl;
+        forClientSockfd = accept(socket_fd,(struct sockaddr*) &clientInfo, &addrlen);	//clientInfo is empty, used to store the received info of client
+        int recv_status;
+		recMessage[0] = 'c';
+        
+
+		//state: left->right abcde
+		while(!quit)
+		{
+			int sendbit = send(forClientSockfd,message,sizeof(message),0);
+            if (sendbit != 0)
+            {
+                recv_status = recv(forClientSockfd,recMessage,sizeof(recMessage),0);
+            
+                if(recv_status == 0 || recv_status == -1)
+                {
+                    //create a pic of failed connect and restart
+                    recMessage[0] == 'x';
+                    quit = true;
+                    close(forClientSockfd);
+                    break;
+                }
+                else if(recMessage[0] == 'x') 
+                {
+                    quit = true;
+                    close(forClientSockfd);
+                }
+                cout<<"The message is : "<<recMessage<<endl;
+				update(recMessage);
+                sleep(1);
+                sendbit = 0;
+            }
+		}
+    }
+
+    //cout<<receiveMessage<<endl;
+    cout<<"close Socket"<<endl;
+	
+    close(socket_fd);
+    return ;
+}
+
 int main( int argc, char* args[] )
 {
+	//set();
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -413,22 +400,11 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_MOUSEBUTTONUP && mouse )
 					{
-						if( !checkmousepos(buttonRect))//x>buttonRect.x && x<buttonRect.x+buttonRect.w && y>buttonRect.y && y<buttonRect.y+buttonRect.h )
+						if( !checkmousepos(buttonRect))
 						{
-							//Apply the image stretched
-							/*
-							SDL_Rect runningRect;
-							runningRect.x = 0;
-							runningRect.y = 0;
-							runningRect.w = SCREEN_WIDTH;
-							runningRect.h = SCREEN_HEIGHT;
-							SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &runningRect );
-
-							//Update the surface
-							SDL_UpdateWindowSurface( gWindow );
-							*/
-							socket_client();
-							reset_screen(buttonRect);
+							set_state(grunningSurface);
+							socket_server();
+							quit = true;
 						}
 						mouse = false;
 					}

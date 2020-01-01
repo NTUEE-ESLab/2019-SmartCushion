@@ -3,14 +3,14 @@ OBJS = src/main.cpp
 
 #CC specifies which compiler we're using
 CC = g++
-CFLAGS = -c
+CFLAGS = -c 
 
 #COMPILER_FLAGS specifies the additional compilation options we're using
 # -w suppresses all warnings
 COMPILER_FLAGS = -w
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lSDL2 -lSDL2_image -pthread
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = main
@@ -23,14 +23,15 @@ all	: SmartCushion
 	@echo -n ""
 
 # optimized version
-SmartCushion		: socket_client.o main.o
-			$(CC) socket_client.o main.o -o SmartCushion
+SmartCushion		: main_server.o #socket_server.o
+			$(CC) main_server.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
+			#$(CC) socket_server.o main_server.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
 
-main.o 	  	 		: src/main.cpp src/socket_client.h
-			$(CC) $< $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $@
+main_server.o 	  	 		: src/main_server.cpp #src/socket_server.h
+			$(CC) $< $(CFLAGS) $(COMPILER_FLAGS) -o $@
 
-socket_client.o		: src/socket_client.cpp src/socket_client.h
-			$(CC) $< $(CFLAGS) -o $@
+#socket_server.o		: src/socket_server.cpp src/socket_server.h 
+#			$(CC) $< $(CFLAGS) -o $@
 
 clean:
 		rm -rf *.o *.a
