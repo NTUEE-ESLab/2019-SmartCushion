@@ -8,7 +8,6 @@ and may not be redistributed without written permission.*/
 #include "socket_client.h"
 
 ///////use for socket
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -17,6 +16,7 @@ and may not be redistributed without written permission.*/
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -35,6 +35,7 @@ void close();
 
 //use for socket
 void socket_client();
+int recvtimeout(int s, char *buf, int len, int timeout);
 
 //Loads individual image
 SDL_Surface* loadSurface( std::string path );
@@ -179,6 +180,34 @@ SDL_Surface* loadSurface( string path )
 	return optimizedSurface;
 }
 
+int recvtimeout(int sockfd, char *buf, int len, int timeout)
+{
+	fd_set fds;	
+	int n;
+	struct timeval tv;
+
+	// file descriptor set
+	FD_ZERO(&fds);
+	FD_SET(sockfd, &fds);
+
+	// set timeout struct timeval
+	tv.tv_sec = timeout;
+	tv.tv_usec = 0;
+
+	// wait until timeout or recieve data
+	n = select(sockfd+1, &fds, NULL, NULL, &tv);
+	// time out
+	if (n == 0) 
+	{
+		cout<<"time out"<<endl;
+		return -2; 
+	}
+	// error
+	if (n == -1) return -1;
+
+	return recv(sockfd, buf, len, 0);
+}
+
 void socket_client()
 {
 	//socket的建立
@@ -211,37 +240,51 @@ void socket_client()
     //Send a message to server
     char message[] = {"Hi, I've heard you!"};
     char receiveMessage[100] = {};
-    char state[1] = {};
+    //char state[1] = {'0'};
+	receiveMessage[0] = '0';
     //state: 0: healthy, 1:too right, 2:too left, 3:sit too long, 4: leave
-    while(state[0] != '4')
+    while(receiveMessage[0] != '4')
     {
 		SDL_Rect stretchRect;
 		stretchRect.x = 0;
 		stretchRect.y = 0;
 		stretchRect.w = SCREEN_WIDTH;
 		stretchRect.h = SCREEN_HEIGHT;
-        recv(sockfd,state,1,0);
-        if(state[0] == '0')
-        {
+		int sendState = send(sockfd,message,sizeof(message),MSG_DONTWAIT);
+		cout << "sendState = " <<receiveMessage[0] <<endl;
+        //int recvState = recv(sockfd,state,1,0);
+		int recvState = recvtimeout(sockfd, receiveMessage, sizeof(receiveMessage), 10);
+		//socket server is closed
+		if(recvState == 0)
+		{
+			cout<<"close Socket"<<endl;
+    		close(sockfd);
+			return;
+		}
+		//error
+		else if(recvState == -1)
+		{
+			cout<<"error";
+		}
+		else if(receiveMessage[0] == '0')
+		{
 			SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &stretchRect );
-        }
-        else if(state[0] == '1')
-        {
-			cout<<"too right"<<endl;
+		}
+		else if(receiveMessage[0] == '1')
+		{
 			SDL_BlitScaled( grightSurface, NULL, gScreenSurface, &stretchRect );
-        }
-        else if(state[0] == '2')
-        {
+		}
+		else if(receiveMessage[0] == '2')
+		{
 			SDL_BlitScaled( gleftSurface, NULL, gScreenSurface, &stretchRect );
-        }
-        else if(state[0] == '3') 
+		}
+		else if(receiveMessage[0] == '3') 
 		{
 			SDL_BlitScaled( gsittingSurface, NULL, gScreenSurface, &stretchRect );
 		}
 		
-		send(sockfd,message,sizeof(message),0);
         //recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
-		cout<<receiveMessage<<endl;
+		cout<<"The message is : "<<receiveMessage<<endl;
 		
 		//Update the surface
 		SDL_UpdateWindowSurface( gWindow );

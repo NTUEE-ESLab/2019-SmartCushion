@@ -51,9 +51,14 @@ int main(int argc , char *argv[])
         forClientSockfd = accept(socket_fd,(struct sockaddr*) &clientInfo, &addrlen);	//clientInfo is empty, used to store the received info of client
         while(1){
             char state[1] = {};
+
+            //int checkRec = recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
+
             cin>>state;
+            int checkRec = recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
+
             send(forClientSockfd,state,1,0);
-            recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
+            
             //send(forClientSockfd,message,sizeof(message),0);
             cout<<"Get: "<<inputBuffer<<endl;
 	    }
