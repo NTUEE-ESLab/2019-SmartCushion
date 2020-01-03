@@ -5,7 +5,6 @@ and may not be redistributed without written permission.*/
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <string>
-#include "socket_client.h"
 
 ///////use for socket
 #include <stdlib.h>

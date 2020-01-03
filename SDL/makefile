@@ -10,7 +10,7 @@ CFLAGS = -c
 COMPILER_FLAGS = -w
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = main
@@ -23,11 +23,11 @@ all	: SmartCushion
 	@echo -n ""
 
 # optimized version
-SmartCushion		: main_server.o #socket_server.o
-			$(CC) main_server.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
+SmartCushion		: main_text.o #socket_server.o
+			$(CC) main_text.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
 			#$(CC) socket_server.o main_server.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
 
-main_server.o 	  	 		: src/main_server.cpp #src/socket_server.h
+main_text.o 	  	 		: src/main_text.cpp #src/socket_server.h
 			$(CC) $< $(CFLAGS) $(COMPILER_FLAGS) -o $@
 
 #socket_server.o		: src/socket_server.cpp src/socket_server.h 
