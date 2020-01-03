@@ -15,6 +15,8 @@ LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = main
 
+
+
 #This is the target that compiles our executable
 #all : $(OBJS)
 #	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
@@ -23,15 +25,17 @@ all	: SmartCushion
 	@echo -n ""
 
 # optimized version
-SmartCushion		: main_text.o #socket_server.o
-			$(CC) main_text.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
-			#$(CC) socket_server.o main_server.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
+SmartCushion		: main.o LButton.o LTexture.o
+			$(CC) main.o LButton.o LTexture.o $(COMPILER_FLAGS) $(LINKER_FLAGS) -o SmartCushion
 
-main_text.o 	  	 		: src/main_text.cpp #src/socket_server.h
+main.o 	  	 		: src/main_render.cpp src/LButton.h src/LTexture.h 
 			$(CC) $< $(CFLAGS) $(COMPILER_FLAGS) -o $@
 
-#socket_server.o		: src/socket_server.cpp src/socket_server.h 
-#			$(CC) $< $(CFLAGS) -o $@
+LButton.o			: src/LButton.cpp src/LButton.h 
+			$(CC) $< $(CFLAGS) $(COMPILER_FLAGS) -o $@
+
+LTexture.o			: src/LTexture.cpp src/LTexture.h 
+			$(CC) $< $(CFLAGS) $(COMPILER_FLAGS) -o $@
 
 clean:
 		rm -rf *.o *.a

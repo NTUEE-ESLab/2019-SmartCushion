@@ -117,6 +117,12 @@ bool init()
 		{
 			//Get window surface
 			gScreenSurface = SDL_GetWindowSurface( gWindow );
+			//Initialize SDL_ttf
+			if( TTF_Init() == -1 )
+			{
+				printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+				success = false;
+			}
 		}
 	}
 
@@ -288,14 +294,19 @@ void update(char *recMessage)
 	//set screen
 	//convert data to string
 	
-	string dataone = "", datatwo = "" , data = ""; 
+	string dataone = "", datatwo = "" , datathree = "" , data = ""; 
     for (int i = 0; i < 5; i++) { 
         dataone = dataone + recMessage[4+i];
 		datatwo = datatwo + recMessage[10+i];
+		datathree = datathree + recMessage[16+i];
+
     }
-	data = "left pressure = "+dataone+", right pressure = "+datatwo;
+	data = "left pressure = "+dataone+", right pressure = "+datatwo+", front pressure = "+datathree;
 	cout << data <<endl;
+	gFont = TTF_OpenFont( "text/lazy.ttf", 28 );
+	if(!gFont) cout<<"gFont error, "<<TTF_GetError()<<endl;
 	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, data.c_str(), textColor );
+	if(!textSurface) cout<<"error"<<endl;
 
 	//0: nonstart; 1:empty
 	if(recMessage[0] == '0' || recMessage[0] == '1')
@@ -377,13 +388,15 @@ void set_state(SDL_Surface *surface, SDL_Surface *dataSurface)
 	dataRect.x = 0;
 	dataRect.y = SCREEN_HEIGHT*3/4;
 	dataRect.w = SCREEN_WIDTH*5/6;
+	dataRect.w = SCREEN_WIDTH*5/6;
 	dataRect.h = SCREEN_HEIGHT/4;
 
 	SDL_BlitScaled( surface, NULL, gScreenSurface, &stretchRect );
 	SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
 	if(dataSurface != NULL)
 	{
-		SDL_BlitScaled( dataSurface, NULL, gScreenSurface, &dataRect );
+		cout<<"show data!"<<endl;
+		SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &dataRect );
 	}
 	//Update the surface
 	SDL_UpdateWindowSurface( gWindow );
@@ -407,7 +420,6 @@ int main( int argc, char* args[] )
 		else
 		{
 			//create a socket
-			char recMessage[20] = {};
 			char message[] = {"request"};
 			int socket_fd = 0, forClientSockfd;
 			socket_fd = socket(AF_INET , SOCK_STREAM , 0);		//AF_INET(IPv6) means two computer communicate with the net. 0 is the defalut value
@@ -486,7 +498,6 @@ int main( int argc, char* args[] )
 						else if(state)
 						{
 							cout<<"running socket"<<endl;
-							cout<<checkmousepos(exitRect);
 							if(!checkmousepos(exitRect))
 							{
 								cout<<"close client"<<endl;
@@ -500,9 +511,10 @@ int main( int argc, char* args[] )
 				}
 				if(state)
 				{
+					char recMessage[24] = {};
 					int sendbit = send(forClientSockfd,message,sizeof(message),0);
 					cout<<"sendbit = "<<sendbit<<endl;
-					int recv_status;
+					int recv_status = 0;
 					if (sendbit != 0)
 					{
 						recv_status = recv(forClientSockfd,recMessage,sizeof(recMessage),0);

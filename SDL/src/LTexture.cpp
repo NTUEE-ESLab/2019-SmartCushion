@@ -33,7 +33,7 @@ bool LTexture::loadFromFile( std::string path ,bool str)
     SDL_Texture* newTexture = NULL;
 
     //Load image at specified path
-    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
+    SDL_Surface* loadedSurface = SDL_LoadBMP( path.c_str() );//IMG_Load( path.c_str() );
     if( loadedSurface == NULL )
     {
         printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
@@ -140,20 +140,17 @@ void LTexture::setAlpha( Uint8 alpha )
     SDL_SetTextureAlphaMod( mTexture, alpha );
 }
 
-void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
+void LTexture::render( int x, int y, SDL_Rect* src)
 {
     //Set rendering space and render to screen
-    SDL_Rect renderQuad = { x, y, mWidth, mHeight };
-
-    //Set clip rendering dimensions
-    if( clip != NULL )
-    {
-        renderQuad.w = clip->w;
-        renderQuad.h = clip->h;
-    }
+    SDL_Rect renderQuad;
+    if (x==0 && y== 0)
+        renderQuad = { x, y, SCREEN_WIDTH, SCREEN_HEIGHT };
+    else 
+        renderQuad = { x, y, mWidth, mHeight};
 
     //Render to screen
-    SDL_RenderCopyEx( gRenderer, mTexture, clip, &renderQuad, angle, center, flip );
+    SDL_RenderCopy( gRenderer, mTexture, src, &renderQuad);
 }
 
 int LTexture::getWidth()

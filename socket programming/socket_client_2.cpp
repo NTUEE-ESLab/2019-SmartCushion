@@ -45,7 +45,7 @@ int main(int argc , char *argv[])
 
 
     //Send a message to server
-    char message[100] = {};
+    char message[15] = {'3','2','1',',','4','4','3','2','1',',','4','4','3','2','1'};
     char receiveMessage[100] = {};
     int send_status, receive_status;
     
@@ -55,9 +55,11 @@ int main(int argc , char *argv[])
         
         receive_status = recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
         cout << "receive : \"" << receiveMessage << "\", status: "<< receive_status<< endl;
-        cin>> message;
+        //cin>> message;
         //message[0] = 'd';
+        
         send_status = send(sockfd,message,sizeof(message),0);
+        cout << "send_status" << send_status<<endl;
         
         
 
