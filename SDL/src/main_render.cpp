@@ -37,6 +37,7 @@ void reset_screen(bool start);
 
 //refresh the screen with current state
 void update(char *recMessage);
+void message();
 
 
 //The window we'll be rendering to
@@ -49,13 +50,13 @@ LTexture gbegin;		//Begin image
 LTexture gconnect;		//Connect image
 LTexture gerror;		//error image
 LTexture gempty;		//empty image
-LTexture gmove;			//move up and down image
+LTexture gmove[10];			//move up and down image
 LTexture gtooleft;		//too left image
 LTexture gleft;			//left image
 LTexture gsitwell;		//sit well image
 LTexture gright;		//right image
 LTexture gtooright;		//too right image
-LTexture gtilt;			//moving right left image
+LTexture gtilt[9];			//moving right left image
 LTexture gsitlong;		//sitting long image
 LTexture gfront;		//sit toward front
 LTexture gdata[3];			//data
@@ -142,7 +143,7 @@ bool loadMedia()
 {
 	//Loading success flag
 	bool success = true;
-
+	string pathone = "pic/", pathtwo = ".bmp";
 	//Loading image
 	if(!gbegin.loadFromFile( "pic/smart_cushion.bmp" ))
 	{
@@ -164,11 +165,15 @@ bool loadMedia()
 		printf( "Failed to load empty image!\n");
 		success = false;
 	}
-	if(!gmove.loadFromFile( "pic/move.bmp" ))
+	for(int i=0 ; i<10 ; i++)
 	{
-		printf( "Failed to load move image!\n" );
-		success = false;
-	};
+		string path =pathone + "move" + to_string(i) + pathtwo;
+		if(!gmove[i].loadFromFile( path ))
+		{
+			printf( "Failed to load move%d image!\n",i);
+			success = false;
+		}
+	}
 	if(!gtooleft.loadFromFile( "pic/too_left.bmp" ))
 	{
 		printf( "Failed to load too_left image!\n" );
@@ -194,10 +199,14 @@ bool loadMedia()
 		printf( "Failed to load too_right image!\n" );
 		success = false;
 	}
-	if(!gtilt.loadFromFile( "pic/tilt.bmp" ))
+	for(int i=0 ; i<9 ; i++)
 	{
-		printf( "Failed to load tilt image!\n" );
-		success = false;
+		string path =pathone + "tilt" + to_string(i) + pathtwo;
+		if(!gtilt[i].loadFromFile( path ))
+		{
+			printf( "Failed to load tilt %d image!\n",i);
+			success = false;
+		}
 	}
 	if(!gsitlong.loadFromFile( "pic/sitting_long.bmp" ))
 	{
@@ -238,13 +247,13 @@ void close_SDL()
 	//Free loaded images
 	gbegin.free();
 	gempty.free();
-	gmove.free();
+	for(int i=0 ; i<10 ;i++)	gmove[i].free();
 	gtooleft.free();
 	gleft.free();
 	gsitwell.free();
 	gright.free();
 	gtooright.free();
-	gtilt.free();
+	for(int i=0 ; i<9 ;i++)	gtilt[i].free();
 	gsitlong.free();
 	gTexture[0].free();
 	gTexture[1].free();
@@ -298,72 +307,59 @@ void update(char *recMessage)
 
 	//0: nonstart; 1:empty
 	if(recMessage[0] == '0' || recMessage[0] == '1')
-	{
-		cout<<"in update function, state is "<<recMessage[0]<<endl;
 		gempty.render(0,0,0);
-	}
 	//2: moving up and down
 	else if(recMessage[0] == '2')
 	{
-		cout<<"in update function, state is "<<recMessage[0]<<endl;
-		gmove.render(0,0,0);
+		for(int i=0 ; i<20 ; i++)
+		{
+			int j = i%10 ;
+			gmove[j].render(0,0,0);
+			gexitButton.render(1);
+			SDL_RenderPresent( gRenderer );
+			SDL_Delay(75);
+		}
 		showdata = false ;
 	}
 	//3: sitting
 	else if(recMessage[0] == '3')
 	{
+		//1: too front
+		if(recMessage[2] == '1') 
+			gfront.render(0,0,0);
 		//0: too left
-		if(recMessage[1] == '0')
-		{
-			cout<<"in update function, state is "<<recMessage[1]<<endl;
+		else if(recMessage[1] == '0')
 			gtooleft.render(0,0,0);
-		}
 		//1: left
 		else if(recMessage[1] == '1')
-		{
-			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gleft.render(0,0,0);
-		}
 		//2: sit well
 		else if(recMessage[1] == '2' && recMessage[2] == '0')
-		{
-			cout<<"in update function, state is "<<recMessage[2]<<endl;
 			gsitwell.render(0,0,0);
-		}
 		//3: right
 		else if(recMessage[1] == '3') 
-		{
-			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gright.render(0,0,0);
-		}
 		//4: too right
 		else if(recMessage[1] == '4') 
-		{
-			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gtooright.render(0,0,0);
-		}
 		//5: move left and right
 		else if(recMessage[1] == '5') 
 		{
-			cout<<"in update function, state is "<<recMessage[1]<<endl;
-			gtilt.render(0,0,0);
+			for(int i=0 ; i<20 ; i++)
+			{
+				int j = i%8 ;
+				gtilt[j].render(0,0,0);
+				gexitButton.render(1);
+				SDL_RenderPresent( gRenderer );
+				SDL_Delay(125);
+			}
 			showdata = false;
-		}
-		else if(recMessage[2] == '1') 
-		{
-			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			gfront.render(0,0,0);
 		}
 	}
 	//4: sitting too long
 	else if(recMessage[0] == '4') 
-	{
-		cout<<"in update function, state is "<<recMessage[0]<<endl;
 		gsitlong.render(0,0,0);
-	}
 	gexitButton.render(1);
-	cout<<"render exit button"<<endl;
-	cout<<"laod data"<<endl;
 	if (showdata)
 		for(int i=0 ; i<3 ; i++)
 		{
@@ -372,7 +368,47 @@ void update(char *recMessage)
 		}
 	
 	SDL_RenderPresent( gRenderer );
+	if(recMessage[1] != '2' || recMessage[2] != '0')
+		message();
 	return;
+}
+
+void message()
+{
+	const SDL_MessageBoxButtonData button = { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "I know it" };
+    
+    const SDL_MessageBoxColorScheme colorScheme = {
+        { /* .colors (.r, .g, .b) */
+            /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+            { 211, 211, 211 },
+            /* [SDL_MESSAGEBOX_COLOR_TEXT] */
+            {   0,   0,   0 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+            {  70, 130, 180 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+            { 173, 216, 230 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+            {  70, 130, 180 }
+        }
+    };
+    const SDL_MessageBoxData messageboxdata = {
+        SDL_MESSAGEBOX_INFORMATION, /* .flags */
+        gWindow, /* .window */
+        "Warning", /* .title */
+        "WARNNING!!!\nYou are sitting with unhealth posture\nPlease go check your status", /* .message */
+        1, /* .numbuttons */
+        &button, /* .buttons */
+        &colorScheme /* .colorScheme */
+    };
+    int buttonid;
+    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+        SDL_Log("error displaying message box");
+    }
+    if (buttonid == -1) {
+        SDL_Log("no selection");
+    } else {
+        SDL_Log("selection was %s", button.text);
+    }
 }
 
 int main( int argc, char* args[] )
