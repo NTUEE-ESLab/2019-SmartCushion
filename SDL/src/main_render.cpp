@@ -393,7 +393,7 @@ void message()
     };
     const SDL_MessageBoxData messageboxdata = {
         SDL_MESSAGEBOX_INFORMATION, /* .flags */
-        gWindow, /* .window */
+        NULL, /* .window */
         "Warning", /* .title */
         "WARNNING!!!\nYou are sitting with unhealth posture\nPlease go check your status", /* .message */
         1, /* .numbuttons */
