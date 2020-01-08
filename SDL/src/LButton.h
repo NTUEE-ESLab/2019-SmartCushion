@@ -9,7 +9,7 @@
 
 //Button constants
 const int BUTTON_WIDTH = 120;
-const int BUTTON_HEIGHT = 110;
+const int BUTTON_HEIGHT = 90;
 const int TOTAL_BUTTONS = 2;
 
 enum LButtonSprite

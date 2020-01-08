@@ -20,8 +20,8 @@
 using namespace std;
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 900;
+const int SCREEN_HEIGHT = 600;
 
 //Starts up SDL and creates window
 bool init();
@@ -33,10 +33,10 @@ bool loadMedia();
 void close_SDL();
 
 //set the start view
-void reset_screen();
-void update(char *recMessage);
+void reset_screen(bool start);
+
 //refresh the screen with current state
-void set_state(LTexture currentTexture, string data);
+void update(char *recMessage);
 
 
 //The window we'll be rendering to
@@ -47,6 +47,7 @@ SDL_Renderer* gRenderer = NULL;
 
 LTexture gbegin;		//Begin image
 LTexture gconnect;		//Connect image
+LTexture gerror;		//error image
 LTexture gempty;		//empty image
 LTexture gmove;			//move up and down image
 LTexture gtooleft;		//too left image
@@ -56,8 +57,8 @@ LTexture gright;		//right image
 LTexture gtooright;		//too right image
 LTexture gtilt;			//moving right left image
 LTexture gsitlong;		//sitting long image
-//LTexture gstart;		//start button
-//LTexture gexit;			//exit button
+LTexture gfront;		//sit toward front
+LTexture gdata[3];			//data
 
 //Globally used font
 TTF_Font *gFont;
@@ -153,6 +154,11 @@ bool loadMedia()
 		printf( "Failed to load connect image!\n" );
 		success = false;
 	}
+	if(!gerror.loadFromFile( "pic/error.bmp" ))
+	{
+		printf( "Failed to load error image!\n" );
+		success = false;
+	}
 	if(!gempty.loadFromFile( "pic/empty.bmp" ))
 	{
 		printf( "Failed to load empty image!\n");
@@ -198,6 +204,11 @@ bool loadMedia()
 		printf( "Failed to load sitting_long image!\n" );
 		success = false;
 	}
+	if(!gfront.loadFromFile( "pic/front.bmp" ))
+	{
+		printf( "Failed to load front image!\n" );
+		success = false;
+	}
 	if(!gTexture[0].loadFromFile( "pic/start_icon.bmp" ))
 	{
 		printf( "Failed to load start_icon image!\n" );
@@ -212,8 +223,8 @@ bool loadMedia()
 	/////set sprite
 
 	//set buttons
-	gstartButton.setPosition( SCREEN_WIDTH*2/5, SCREEN_HEIGHT*2/3);
-    gexitButton.setPosition( SCREEN_WIDTH*5/6, SCREEN_HEIGHT*3/4);
+	gstartButton.setPosition( 390, 350);
+    gexitButton.setPosition( 780, 510);
 	gTexture[0].setHeight(BUTTON_HEIGHT);
 	gTexture[0].setWidth(BUTTON_WIDTH);
 	gTexture[1].setHeight(BUTTON_HEIGHT);
@@ -238,6 +249,9 @@ void close_SDL()
 	gTexture[0].free();
 	gTexture[1].free();
 
+	//Free global font
+    TTF_CloseFont( gFont );
+    gFont = NULL;
 
 	//Destroy window
 	SDL_DestroyRenderer( gRenderer );
@@ -248,15 +262,21 @@ void close_SDL()
 	//Quit SDL subsystems
 	IMG_Quit();
 	SDL_Quit();
+	TTF_Quit();
 }
 
-//set the start view
-void reset_screen()
+//set the start or error view
+void reset_screen(bool start)
 {
 	SDL_RenderClear( gRenderer );
 	//Apply the image stretched
-	gbegin.render(0,0,0);
-	gstartButton.render(0);
+	if (start)
+	{
+		gbegin.render(0,0,0);
+		gstartButton.render(0);
+	}
+	else 
+		gerror.render(0,0,0);
 
 	//Update screen
 	SDL_RenderPresent( gRenderer );
@@ -266,103 +286,91 @@ void update(char *recMessage)
 {
 	//set screen
 	//convert data to string
-	
-	string dataone = "", datatwo = "" , datathree = "" , data = ""; 
+	bool showdata = true;
+	string data[3]; 
     for (int i = 0; i < 5; i++) { 
-        dataone = dataone + recMessage[4+i];
-		datatwo = datatwo + recMessage[10+i];
-		datathree = datathree + recMessage[16+i];
-
+        data[0] = data[0] + recMessage[4+i];
+		data[1] = data[1] + recMessage[10+i];
+		data[2] = data[2] + recMessage[16+i];
     }
-	data = "left pressure = "+dataone+", right pressure = "+datatwo+", front pressure = "+datathree;
-	cout << data <<endl;
-	gFont = TTF_OpenFont( "text/lazy.ttf", 28 );
-	if(!gFont) cout<<"gFont error, "<<TTF_GetError()<<endl;
-	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, data.c_str(), textColor );
-	if(!textSurface) cout<<"error"<<endl;
+	string datacon = "left pressure = "+data[0]+", right pressure = "+data[1]+", front pressure = "+data[2];
+	cout << datacon <<endl;
 
 	//0: nonstart; 1:empty
 	if(recMessage[0] == '0' || recMessage[0] == '1')
 	{
 		cout<<"in update function, state is "<<recMessage[0]<<endl;
-		//set_state(gempty, data);
 		gempty.render(0,0,0);
 	}
 	//2: moving up and down
 	else if(recMessage[0] == '2')
 	{
 		cout<<"in update function, state is "<<recMessage[0]<<endl;
-		//set_state(gmove, data);
 		gmove.render(0,0,0);
+		showdata = false ;
 	}
 	//3: sitting
 	else if(recMessage[0] == '3')
 	{
 		//0: too left
-		if(recMessage[2] == '0')
+		if(recMessage[1] == '0')
 		{
-			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			//set_state(gtooleft, data);
+			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gtooleft.render(0,0,0);
 		}
 		//1: left
-		else if(recMessage[2] == '1')
+		else if(recMessage[1] == '1')
 		{
-			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			//set_state(gleft, data);
+			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gleft.render(0,0,0);
 		}
 		//2: sit well
-		else if(recMessage[2] == '2')
+		else if(recMessage[1] == '2' && recMessage[2] == '0')
 		{
 			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			//set_state(gsitwell, data);
 			gsitwell.render(0,0,0);
 		}
 		//3: right
-		else if(recMessage[2] == '3') 
+		else if(recMessage[1] == '3') 
 		{
-			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			//set_state(gright, data);
+			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gright.render(0,0,0);
 		}
 		//4: too right
-		else if(recMessage[2] == '4') 
+		else if(recMessage[1] == '4') 
 		{
-			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			//set_state(gtooright, data);
+			cout<<"in update function, state is "<<recMessage[1]<<endl;
 			gtooright.render(0,0,0);
 		}
 		//5: move left and right
-		else if(recMessage[2] == '5') 
+		else if(recMessage[1] == '5') 
+		{
+			cout<<"in update function, state is "<<recMessage[1]<<endl;
+			gtilt.render(0,0,0);
+			showdata = false;
+		}
+		else if(recMessage[2] == '1') 
 		{
 			cout<<"in update function, state is "<<recMessage[2]<<endl;
-			//set_state(gtilt, data);
-			gtilt.render(0,0,0);
+			gfront.render(0,0,0);
 		}
 	}
 	//4: sitting too long
 	else if(recMessage[0] == '4') 
 	{
 		cout<<"in update function, state is "<<recMessage[0]<<endl;
-		//set_state(gsitlong, data);
 		gsitlong.render(0,0,0);
 	}
 	gexitButton.render(1);
 	cout<<"render exit button"<<endl;
-	SDL_RenderPresent( gRenderer );
-	return;
-}
-
-void set_state(LTexture currentTexture, string data)
-{
-	cout<<"set state"<<endl;
-	SDL_RenderClear( gRenderer );
-	cout<<"clear"<<endl;
-	currentTexture.render(0,0,0);
-	cout<<"render current texture"<<endl;
-	gexitButton.render(1);
-	cout<<"render exit button"<<endl;
+	cout<<"laod data"<<endl;
+	if (showdata)
+		for(int i=0 ; i<3 ; i++)
+		{
+			gdata[i].loadFromRenderedText(data[i],textColor);
+			gdata[i].render(775,150+48*i,0);
+		}
+	
 	SDL_RenderPresent( gRenderer );
 	return;
 }
@@ -392,6 +400,7 @@ int main( int argc, char* args[] )
 			
 			if (socket_fd == -1){
 				cout<<"Fail to create a socket."<<endl;
+				reset_screen(false);
 			}
 
 			//connection of socket
@@ -415,7 +424,7 @@ int main( int argc, char* args[] )
 			//Event handler
 			SDL_Event e;
 
-			reset_screen();
+			reset_screen(true);
 
 			//While application is running
 			while( !quit )
@@ -447,7 +456,7 @@ int main( int argc, char* args[] )
 						cout<<"close client"<<endl;
 						close(forClientSockfd);
 						state = false;
-						reset_screen();
+						reset_screen(true);
 					}
 				}
 				if(state)

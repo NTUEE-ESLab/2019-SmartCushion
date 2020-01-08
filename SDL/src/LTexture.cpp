@@ -1,8 +1,8 @@
 #include "LTexture.h"
 using namespace std;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 900;
+const int SCREEN_HEIGHT = 600;
 
 extern SDL_Renderer* gRenderer;
 
@@ -73,7 +73,6 @@ bool LTexture::loadFromFile( std::string path ,bool str)
     return mTexture != NULL;
 }
 
-#ifdef _SDL_TTF_H
 bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
 {
     //printf("%s\n",textureText);
@@ -81,6 +80,9 @@ bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColo
     free();
 
     //Render text surface
+    printf("start loading...\n");
+    gFont = TTF_OpenFont( "text/calibril.ttf", 28 );
+    if(!gFont) printf("gFont error, %s\n",TTF_GetError());
     SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
     if( textSurface == NULL )
     {
@@ -108,8 +110,6 @@ bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColo
     //Return success
     return mTexture != NULL;
 }
-#endif
-
 void LTexture::free()
 {
     //Free texture if it exists
