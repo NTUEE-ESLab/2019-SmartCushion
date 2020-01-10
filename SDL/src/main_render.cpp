@@ -296,6 +296,8 @@ void update(char *recMessage)
 	//set screen
 	//convert data to string
 	bool showdata = true;
+	bool showmessage = true;
+	char oldState[3];
 	string data[3]; 
     for (int i = 0; i < 5; i++) { 
         data[0] = data[0] + recMessage[4+i];
@@ -307,7 +309,10 @@ void update(char *recMessage)
 
 	//0: nonstart; 1:empty
 	if(recMessage[0] == '0' || recMessage[0] == '1')
+	{
 		gempty.render(0,0,0);
+		showmessage = false;
+	}
 	//2: moving up and down
 	else if(recMessage[0] == '2')
 	{
@@ -324,18 +329,18 @@ void update(char *recMessage)
 	//3: sitting
 	else if(recMessage[0] == '3')
 	{
-		//1: too front
-		if(recMessage[2] == '1') 
-			gfront.render(0,0,0);
 		//0: too left
-		else if(recMessage[1] == '0')
+		if(recMessage[1] == '0')
 			gtooleft.render(0,0,0);
 		//1: left
 		else if(recMessage[1] == '1')
 			gleft.render(0,0,0);
 		//2: sit well
 		else if(recMessage[1] == '2' && recMessage[2] == '0')
+		{
 			gsitwell.render(0,0,0);
+			showmessage = false;
+		}	
 		//3: right
 		else if(recMessage[1] == '3') 
 			gright.render(0,0,0);
@@ -355,6 +360,9 @@ void update(char *recMessage)
 			}
 			showdata = false;
 		}
+		//1: too front
+		else if(recMessage[2] == '1') 
+			gfront.render(0,0,0);
 	}
 	//4: sitting too long
 	else if(recMessage[0] == '4') 
@@ -368,8 +376,15 @@ void update(char *recMessage)
 		}
 	
 	SDL_RenderPresent( gRenderer );
-	if(recMessage[1] != '2' || recMessage[2] != '0')
-		message();
+	if(showmessage)
+	{
+		if(oldState[0]!=recMessage[0] || oldState[1]!=recMessage[1] || oldState[2]!=recMessage[2]);
+			message();
+	}
+	for(int i=0 ; i<3 ;i++)
+	{
+		oldState[i] = recMessage[i];
+	}
 	return;
 }
 
@@ -445,8 +460,8 @@ int main( int argc, char* args[] )
 			bzero(&serverInfo,sizeof(serverInfo));						//initialize, set bits to 0
 
 			serverInfo.sin_family = PF_INET;						//sockaddr_in is IPv4
-			serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
-			//serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
+			//serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");	//IP address. inet_addr is convert address from string to int
+			serverInfo.sin_addr.s_addr = inet_addr("192.168.43.8");
 			serverInfo.sin_port = htons(8700);						//trans local endian to net endian
 
 			//connect is to get data from other, while bind is to bind own ad
