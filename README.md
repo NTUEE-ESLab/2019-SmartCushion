@@ -9,7 +9,7 @@ https://www.youtube.com/watch?v=AC_ZPusRJfo&feature=share
 ## Abstract
 We use DISCO-L475VG-IOT01A to develope a portable device that can be put in cushion and record our sitting posture. By connecting with 3 FSR sensors, L475VG records the pressure while people sitting on the chair. L475VG will handle the data and analysize user's current sitting posture. 
 We devide sitting posture into several type :
-1. empty , 2. sit well , 3. tilt left/right , 4. sitting too long , 5. moving.
+1. empty 2. sit well 3. tilt left/right 4. sitting too long 5. moving.
  
 L475VG uses socket to communicate with PC. L475VG serves as socket client, while PC serves as socket server. It will send raw data and current state of user to PC. In PC side, we develope a desktop application to show the data and send warning message to user while they are in bad posture.
 
