@@ -50,10 +50,12 @@ Requirement : SDL2, SDL_ttf 2.0, run on Linux
 5. type `./Smartcushion`, then the program will start.
 
 ### Board Side
-Requirement : Mbed Studio on Windows, DISCO-L475VG-IOT01A board
-1. Run PC side program first, so L475VG can connect to it as client.
-2. Download our repository.
-3. Create a workable project on Mbed Studio, and clone all files in `STM32/FSR402/` into it.
-4. Note that wifi connecting information is in `mbed_app.json` file, modify it.
-5. Plug L475VG to computer, and Mbed Studio will show `DISCO-L475VG-IOT01A` on target column.
-6. Compile and run :)
+Requirement : Mbed Studio on Windows, DISCO-L475VG-IOT01A board, FSR sensors
+![](https://i.imgur.com/vCISh2l.png)
+1. Connect FSR sensors to board. Analog A0, A1, A2.
+2. Run PC side program first, so L475VG can connect to it as client.
+3. Download our repository.
+4. Create a workable project on Mbed Studio, and clone all files in `STM32/FSR402/` into it.
+5. Note that wifi connecting information is in `mbed_app.json` file, modify it.
+6. Plug L475VG to computer, and Mbed Studio will show `DISCO-L475VG-IOT01A` on target column.
+7. Compile and run :)
