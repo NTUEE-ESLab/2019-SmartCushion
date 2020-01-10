@@ -57,5 +57,5 @@ Requirement : Mbed Studio on Windows, DISCO-L475VG-IOT01A board, FSR sensors
 3. Download our repository.
 4. Create a workable project on Mbed Studio, and clone all files in `STM32/FSR402/` into it.
 5. Note that wifi connecting information is in `mbed_app.json` file, modify it.
-6. Plug L475VG to computer, and Mbed Studio will show `DISCO-L475VG-IOT01A` on target column.
+6. Plug L475VG to computer, and Mbed Studio will show `DISCO-L475VG-IOT01A` on `target` column.
 7. Compile and run :)
