@@ -6,9 +6,9 @@ Wan Hsuan Lin(林宛萱) wanhsuan0506@gmail.com
 https://www.youtube.com/watch?v=AC_ZPusRJfo&feature=share
 ## 
 ## Abstract
-We use DISCO-L475VG-IOT01A to develope a portable device that can be put in cushion and record our sitting posture. We use 3 FSR sensors connected to L475VG to record the pressure while we sit on the chair. L475VG will calculate the data, analysizing user's current sitting posture. 
-We devide sitting posture into several type : 1. empty, 2. sit well, 3. tilt left/right, 4. sitting too long, 5, moving. 
-L475VG uses socket to communicate with PC. L475VG serves as socket client, while PC serves as socket server. It will send raw data and current state of user to PC. In PC side, we develope a desktop application to show the data and send warning message to user while they are in bad posture.
+We use DISCO-L475VG-IOT01A to develop a portable device that can be put in a cushion and record our sitting posture. We use 3 FSR sensors connected to L475VG to record the pressure while we sit on the chair. L475VG will calculate the data, analysizing user's current sitting posture. 
+We divide sitting posture into several types : 1. empty, 2. sit well, 3. tilt left/right, 4. sitting too long, 5, moving. 
+L475VG uses socket to communicate with PC. L475VG serves as socket client, while PC serves as socket server. It will send raw data and the current state of the user to PC. In PC side, we develope a desktop application to show the data and send a warning message to the user while they are in bad posture.
 
 
 ## Content
@@ -17,7 +17,7 @@ L475VG uses socket to communicate with PC. L475VG serves as socket client, while
 * Setup
 
 ## Motivation
-Nowadays, people spend a lot of time sitting on chair. However, bad sitting posture and long-time sitting will cause damage to our health. Thus, we decide to develope a smart cushion that can be portable and easily installed on our chair to help us take care our health.  
+Nowadays, people spend a lot of time sitting on chair. However, bad sitting posture and long-time sitting will cause damage to our health. Thus, we decide to develop a smart cushion that can be portable and easily installed on our chair to help us take care our health.  
 
 
 ## Implemetation
