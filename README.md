@@ -2,7 +2,7 @@
 ### Author : 
 Wan Hsuan Lin(林宛萱) wanhsuan0506@gmail.com
 
-hisn-ray-yang(楊欣睿) csehten@gmail.com
+hisn-ray-yang(楊欣睿) b06901080@g.ntu.edu.tw
 ### Demo video : 
 https://www.youtube.com/watch?v=AC_ZPusRJfo&feature=share
 ## 
