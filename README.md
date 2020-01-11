@@ -7,7 +7,7 @@ hisn-ray-yang(楊欣睿) b06901080@g.ntu.edu.tw
 https://www.youtube.com/watch?v=AC_ZPusRJfo&feature=share
 ## 
 ## Abstract
-We use DISCO-L475VG-IOT01A to develop a portable device that can be put in cushion and record our sitting posture. By connecting with 3 FSR sensors, L475VG records the pressure while people sitting on the chair. L475VG will handle the data and analysize user's current sitting posture. 
+We use DISCO-L475VG-IOT01A to develop a portable device that can be put in cushion and record our sitting posture. By connecting with 3 FSR sensors, L475VG records the pressure while people sit on the chair. L475VG will handle the data and analysize user's current sitting posture. 
 We devide sitting posture into several type :
 1. empty 2. sit well 3. tilt left/right 4. sitting too long 5. moving.
  
